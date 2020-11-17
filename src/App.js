@@ -2,15 +2,15 @@ import React from 'react';
 import './App.css';
 import 'h8k-components';
 
-import Slides from './components/Slides';
-const title = "Slideshow App";
+import Mono from './components/Mono';
+const title = "Mono app";
 
-function App({slides}) {
+function App() {
     return (
         <div>
             <h8k-navbar header={title}></h8k-navbar>
             <div className="App">
-                <Slides slides={slides} />
+                <Mono />
             </div>
         </div>
     );

@@ -1,4 +1,3 @@
-import { setState } from 'expect';
 import React, {useState} from 'react';
 
 function Slides({slides}) {
@@ -27,7 +26,7 @@ function Slides({slides}) {
             <div id="navigation" className="text-center">
                 <button data-testid="button-restart" className="small outlined " disabled={slides[0] === slides[index]  ? true : ""}  onClick={restart} >Restart</button>
                 <button data-testid="button-prev" className="small" disabled={slides[0] === slides[index]  ? true : false} onClick={prev}>Prev</button>
-                <button data-testid="button-next" className="small" disabled={slides[4] === slides[index] ? true : false}  onClick={next}>Next</button>
+                <button data-testid="button-next" className="small" disabled={slides[slides.length - 1] === slides[index] ? true : false}  onClick={next}>Next</button>
             </div>
             <div id="slide" className="card text-center">
                 <h1 data-testid="title">{slides[index].title}</h1>

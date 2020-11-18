@@ -1,6 +1,5 @@
 import React, { setState } from 'react';
 
-
 class Mono extends React.Component{
     constructor(props){
         super(props);
@@ -9,7 +8,7 @@ class Mono extends React.Component{
             email: '',
             phone: '',
             blogurl: '',
-            checker: ''
+            checker: 'Form is Incomplete!',
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -25,6 +24,7 @@ class Mono extends React.Component{
 
     handleSubmit(event){
         event.preventDefault();
+        this.props.isFormValid(true);
         let {
             blogurl,
             email,
@@ -43,8 +43,6 @@ class Mono extends React.Component{
                 checker: "Form is Incomplete"
             });
         }
-
-        
     }
 
     render(){
@@ -56,32 +54,30 @@ class Mono extends React.Component{
                 <form onSubmit={this.handleSubmit}>
                     <div>
                     <label htmlFor="">Name:
-                        <input type="text" name="name" onChange={this.handleChange}/>
+                        <input type="text" name="name" className="name" onChange={this.handleChange}/>
                     </label>
                     </div>
                     <div>
                     <label htmlFor="">Email:
-                        <input type="email" name="email" onChange={this.handleChange}/>
+                        <input type="email" name="email" className="email" onChange={this.handleChange}/>
                     </label>
                     </div>
                     <div>
-
                     <label htmlFor="">Phone:
-                        <input type="text" name="phone" onChange={this.handleChange}/>
+                        <input type="text" name="phone" className="phone" onChange={this.handleChange}/>
                     </label>
                     </div>
                     <div>
-
                     <label htmlFor="">Blogurl:
-                        <input type="text" name="url" onChange={this.handleChange}/>
+                        <input type="text" name="url" className="url" onChange={this.handleChange}/>
                     </label>
                     </div>
-                    <button type='submit' value='submit'>Verify</button>
+                    <button type='submit' className="button" value='submit'>Verify</button>
                 </form>
-            <p>{this.state.checker}</p>
+            <p className="message">{this.state.checker}</p>
             </div>
         );
-    }
+        }
     }
 
     export default Mono;

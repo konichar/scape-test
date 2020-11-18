@@ -1,99 +1,104 @@
 import React from 'react';
 import App from './App';
-import { render, within, fireEvent, cleanup } from '@testing-library/react';
+import Mono from './components/Mono';
 
-import '@testing-library/jest-dom/extend-expect';
+import Adapter from 'enzyme-adapter-react-16';
+import Enzyme from 'enzyme';
 
-const testIds = {
-  restartButton: "button-restart",
-  prevButton: "button-prev",
-  nextButton: "button-next",
-  title: "title",
-  text: "text",
-};
-
-const makeSlides = (numSlides) => Array.from({length: 10}, (_, idx) => ({ title: `title ${idx}`, text: `text ${idx}` }));
-
-const renderApp = (slides) => render(<App slides={slides} />);
+import ReactDOM from 'react-dom';
+// import Mono from '../components/Form';
+// import Message from '../components/Message';
+import expect from 'expect';
+import { mount, shallow } from 'enzyme';
+import renderer from 'react-test-renderer';
+import { spy } from 'sinon';
 
 
-beforeEach(() => {
-});
 
-afterEach(() => {
-  cleanup();
-});
+Enzyme.configure({ adapter: new Adapter() });
 
-test('App renders correctly', () => {
-  const slides = makeSlides(2);
 
-  const { getByTestId } = renderApp(slides);
+describe('Form Validation <App />', () => {
+  it('renders without crashing', () => {
+    const div = document.createElement('div');
+    ReactDOM.render(<App />, div);
+  });
 
-  const restartButton = getByTestId(testIds.restartButton);
-  expect(restartButton).toHaveTextContent("Restart");
-  expect(restartButton).toBeDisabled();
+	it('check default message', () => {
+  	const app = mount(<App />);
+  	let txt = app.find('.message').text()
+  	expect(txt).toEqual("Form is Incomplete!");
+	});
 
-  const prevButton = getByTestId(testIds.prevButton);
-  expect(prevButton).toHaveTextContent("Prev");
-  expect(prevButton).toBeDisabled();
+  it('check if all forms fields exist', () => {
+    const wrapper = mount(<Mono />);
+    let len = wrapper.find('input').length;
+    expect(len).toEqual(4);
+  });
 
-  const nextButton = getByTestId(testIds.nextButton);
-  expect(nextButton).toHaveTextContent("Next");
-  expect(nextButton).toBeEnabled();
+  it('check entire form validation when the form is valid', () => {
+    let formSpy = spy();
+    const form = mount(<Mono isFormValid={formSpy} />);
+    form.find('.name').simulate('change', { target: { value: 'sasrank' } });
+    form.find('.email').simulate('change', { target: { value: 'aasdbc@xyz.com' } });
+    form.find('.phone').simulate('change', { target: { value: '9856756710' } });
+    form.find('.url').simulate('change', { target: { value: 'http://google.com' } });
+    form.find('.button').simulate('click');
+    expect(formSpy.calledWith(true)).toEqual(true);
+  });
 
-  const titleElem = getByTestId(testIds.title);
-  expect(titleElem).toHaveTextContent(slides[0].title);
+  it('check entire form validation when the name is invalid', () => {
+    let formSpy = spy();
+    const form = mount(<Mono isFormValid={formSpy} />);
+    form.find('.name').simulate('change', { target: { value: 'ui' } });
+    form.find('.email').simulate('change', { target: { value: 'abc@xyz.com' } });
+    form.find('.phone').simulate('change', { target: { value: '0156756710' } });
+    form.find('.url').simulate('change', { target: { value: 'http://google.com' } });
+    form.find('.button').simulate('click');
+    expect(formSpy.calledWith(true)).toEqual(false);
+  });
 
-  const textElem = getByTestId(testIds.text);
-  expect(textElem).toHaveTextContent(slides[0].text);
-});
+  it('check entire form validation when the phone number is invalid', () => {
+    let formSpy = spy();
+    const form = mount(<Mono isFormValid={formSpy} />);
+    form.find('.name').simulate('change', { target: { value: 'sasrank' } });
+    form.find('.email').simulate('change', { target: { value: 'abc@xyz.com' } });
+    form.find('.phone').simulate('change', { target: { value: '0156756710' } });
+    form.find('.url').simulate('change', { target: { value: 'http://google.com' } });
+    form.find('.button').simulate('click');
+    expect(formSpy.calledWith(true)).toEqual(false);
+  });
 
-test('Switching between slides works as expected', () => {
-  const slides = makeSlides(5);
+  it('check entire form validation when the email is invalid', () => {
+    let formSpy = spy();
+    const form = mount(<Mono isFormValid={formSpy} />);
+    form.find('.name').simulate('change', { target: { value: 'sasrank' } });
+    form.find('.email').simulate('change', { target: { value: 'abc@xyz.' } });
+    form.find('.phone').simulate('change', { target: { value: '9856756710' } });
+    form.find('.url').simulate('change', { target: { value: 'http://google.com' } });
+    form.find('.button').simulate('click');
+    expect(formSpy.calledWith(true)).toEqual(false);
+  });
 
-  const { getByTestId } = renderApp(slides);
+  it('check entire form validation when the url is invalid', () => {
+    let formSpy = spy();
+    const form = mount(<Mono isFormValid={formSpy} />);
+    form.find('.name').simulate('change', { target: { value: 'sasrank' } });
+    form.find('.email').simulate('change', { target: { value: 'abc@xyz.com' } });
+    form.find('.phone').simulate('change', { target: { value: '9856756710' } });
+    form.find('.url').simulate('change', { target: { value: 'ht' } });
+    form.find('.button').simulate('click');
+    expect(formSpy.calledWith(true)).toEqual(false);
+  });
 
-  const restartButton = getByTestId(testIds.restartButton);
-  const prevButton = getByTestId(testIds.prevButton);
-  const nextButton = getByTestId(testIds.nextButton);
-  const titleElem = getByTestId(testIds.title);
-  const textElem = getByTestId(testIds.text);
-
-  const clicks = [
-    'next', 'next', 'next', 'prev', 'prev', 'prev', 'next', 'next', 'restart', 'next', 'next', 'next', 'next', 'prev',
-  ];
-
-  let idx = 0;
-  for (const click of clicks) {
-    if (click === 'restart') {
-      fireEvent.click(restartButton);
-      idx = 0;
-    } else if (click === 'prev') {
-      fireEvent.click(prevButton);
-      idx -= 1;
-    } else if (click === 'next') {
-      fireEvent.click(nextButton);
-      idx += 1;
-    }
-    expect(idx >= 0).toEqual(true);
-    expect(idx < slides.length).toEqual(true);
-
-    if (idx > 0) {
-      expect(restartButton).toBeEnabled();
-      expect(prevButton).toBeEnabled();
-    } else {
-      expect(restartButton).toBeDisabled();
-      expect(prevButton).toBeDisabled();
-    }
-
-    if (idx+1 < slides.length) {
-      expect(nextButton).toBeEnabled();
-    } else {
-      expect(nextButton).toBeDisabled();
-    }
-
-    const { title, text } = slides[idx];
-    expect(titleElem).toHaveTextContent(title);
-    expect(textElem).toHaveTextContent(text);
-  }
+  it('check form validation when the entire form is invalid', () => {
+    let formSpy = spy();
+    const form = mount(<Mono isFormValid={formSpy} />);
+    form.find('.name').simulate('change', { target: { value: '' } });
+    form.find('.email').simulate('change', { target: { value: '33' } });
+    form.find('.phone').simulate('change', { target: { value: '567567560' } });
+    form.find('.url').simulate('change', { target: { value: 'h9' } });
+    form.find('.button').simulate('click');
+    expect(formSpy.calledWith(true)).toEqual(false);
+  });
 });
